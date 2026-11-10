@@ -1255,7 +1255,7 @@ const operational=calendarOf(t)==='operations';
 const hasText = t.cover_title || t.copy || t.cta;
 const hasSrc = t.source_name || t.source_link || t.time_from;
 const roNote=!canEdit(t)?'<div class="ro-note">للعرض فقط — المهمة غير مسندة إليك. تقدر تضيف تعليق.</div>':'';
-const lockWho=!st.admin;
+const lockWho=!(st.admin||st.canAssign);
 return roNote +
 '<textarea class="title-in" id="e_title" rows="1" placeholder="ما المهمة؟">' + esc(t.title) + '</textarea>' +
  '<div class="fld calendar-kind"><span>الكالندر</span><select id="e_calendar_kind"><option value="publishing"'+(!operational?' selected':'')+'>كالندر النشر</option><option value="operations"'+(operational?' selected':'')+'>كالندر العمليات</option></select><small id="calendarHelp">'+(operational?'موعد تنفيذ المهمة، بدون موعد نشر.':'الموعد هنا لنشر المحتوى؛ التنفيذ له كالندر منفصل.')+'</small></div>' +
@@ -1463,7 +1463,7 @@ async function load(silent){
 let painted=false;
 if (!silent){
  const snap=bootSnapshot();
- if(snap){st.user=snap.user;st.admin=snap.admin;st.tasks=snap.tasks;st.team=snap.team;st.campaigns=snap.campaigns;st.roles=Object.assign(st.roles,snap.roles||{});applyRoleLabels();
+ if(snap){st.user=snap.user;st.admin=snap.admin;st.canAssign=!!snap.canAssign;st.tasks=snap.tasks;st.team=snap.team;st.campaigns=snap.campaigns;st.roles=Object.assign(st.roles,snap.roles||{});applyRoleLabels();
   $('#adminBtn').classList.toggle('hidden',!st.admin);$('#followMenuBtn').classList.toggle('hidden',!st.admin);$('#archiveTasksBtn').classList.toggle('hidden',!st.admin);
   $('#meName').textContent=nameOf(st.user);if(!st.open)render();painted=true;const ss=$('#connectionState');if(ss)ss.textContent='جارٍ التحديث…';}
  else skeleton();
@@ -1471,7 +1471,7 @@ if (!silent){
 try {
 const d = await rpc('bootstrap');
 try{lsSet('tasheeh_boot',JSON.stringify({token:st.token,d}));}catch(e){}
-st.user=d.user;st.admin=d.admin;st.mailMode=d.mailMode;$('#archiveTasksBtn').classList.toggle('hidden',!st.admin);$('#adminBtn').classList.toggle('hidden',!st.admin);$('#followMenuBtn').classList.toggle('hidden',!st.admin);$('#login').classList.add('hidden');$('#app').classList.remove('hidden');
+st.user=d.user;st.admin=d.admin;st.canAssign=!!d.canAssign;st.mailMode=d.mailMode;$('#archiveTasksBtn').classList.toggle('hidden',!st.admin);$('#adminBtn').classList.toggle('hidden',!st.admin);$('#followMenuBtn').classList.toggle('hidden',!st.admin);$('#login').classList.add('hidden');$('#app').classList.remove('hidden');
 if(!st.todayShown&&st.admin&&!lsGet('tasheeh_scope'))st.scope='team';
 st.tasks = d.tasks; st.team = d.team; st.campaigns = d.campaigns; st.roles = Object.assign(st.roles, d.roles || {});
 applyRoleLabels();
